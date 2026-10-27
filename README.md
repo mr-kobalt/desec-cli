@@ -14,6 +14,44 @@ Download the latest release from the [releases page](https://github.com/swagner-
 go install github.com/swagner-de/desec-cli@latest
 ```
 
+### Nix / NixOS
+
+This fork includes a flake:
+
+```bash
+nix run github:mr-kobalt/desec-cli
+nix build github:mr-kobalt/desec-cli
+```
+
+Add it as a flake input:
+
+```nix
+{
+  inputs.desec-cli.url = "github:mr-kobalt/desec-cli";
+  # Recommended so the CLI uses the same nixpkgs revision as your system.
+  inputs.desec-cli.inputs.nixpkgs.follows = "nixpkgs";
+}
+```
+
+Then install the package:
+
+```nix
+environment.systemPackages = [
+  inputs.desec-cli.packages.${pkgs.system}.default
+];
+```
+
+Or use the overlay:
+
+```nix
+nixpkgs.overlays = [ inputs.desec-cli.overlays.default ];
+environment.systemPackages = [ pkgs.desec-cli ];
+```
+
+Do not put your deSEC API token in the Nix store. Use `sops-nix`, `agenix`, or
+another secret manager to create a mode-`0600` `~/.config/desec-cli/config.yaml`,
+or provide `DESEC_TOKEN` through an environment file that is not world-readable.
+
 ## Configuration
 
 ### Config file
